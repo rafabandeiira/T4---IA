@@ -25,54 +25,93 @@ EVAL_TEMPLATE = [
 
 def make_move(state) -> Tuple[int, int]:
 
-    start = time.perf_counter()
-    TIME_LIMIT = 5.0
+    inicio = time.perf_counter()
+    LIMITE_TEMPO = 5.0
 
-    best_move = None
-    depth = 1
+    melhor_jogada = None
+    profundidade = 1
+
     while True:
-        if time.perf_counter() - start > TIME_LIMIT:
+        if time.perf_counter() - inicio >= LIMITE_TEMPO:
             break
-        move = minimax_move(state, max_depth=depth, eval_func=evaluate_custom)
-        if move is not None:
-            best_move = move
-        depth += 1
-        if depth > 10:
+
+        jogada = minimax_move(
+            state,
+            max_depth=profundidade,
+            eval_func=evaluate_custom
+        )
+
+        if jogada is not None:
+            melhor_jogada = jogada
+
+        profundidade += 1
+
+        # Segurança para não tentar profundidades enormes
+        if profundidade > 10:
             break
-    return best_move
+
+    return melhor_jogada
 
 
-def evaluate_custom(state, player:str) -> float:
+def evaluate_custom(state, jogador: str) -> float:
 
-    board = state.board.tiles
-    opponent = 'B' if player == 'W' else 'W'
+    tabuleiro = state.board.tiles
+    adversario = 'W' if jogador == 'B' else 'B'
 
-    count_player = sum(row.count(player) for row in board)
-    count_opponent = sum(row.count(opponent) for row in board)
-    piece_diff = count_player - count_opponent
+    # =========================
+    # 1) Diferença de peças
+    # =========================
+    qtd_jogador = sum(linha.count(jogador) for linha in tabuleiro)
+    qtd_adversario = sum(linha.count(adversario) for linha in tabuleiro)
+    diferenca_pecas = qtd_jogador - qtd_adversario
 
-    current_player = state.player
-    state.player = player
-    player_moves = len(state.get_actions())
-    state.player = opponent
-    opponent_moves = len(state.get_actions())
-    state.player = current_player
-    mobility = player_moves - opponent_moves
+    # =========================
+    # 2) Mobilidade
+    # =========================
+    jogador_original = state.player
 
-    corners = [(0, 0), (0, 7), (7, 0), (7, 7)]
-    corner_score = 0
-    for y, x in corners:
-        if board[y][x] == player:
-            corner_score += 25
-        elif board[y][x] == opponent:
-            corner_score -= 25
+    state.player = jogador
+    movimentos_jogador = len(state.get_actions())
 
-    mask_score = 0
+    state.player = adversario
+    movimentos_adversario = len(state.get_actions())
+
+    # restaurar o jogador original
+    state.player = jogador_original
+
+    mobilidade = movimentos_jogador - movimentos_adversario
+
+    # =========================
+    # 3) Controle dos cantos
+    # =========================
+    cantos = [(0, 0), (0, 7), (7, 0), (7, 7)]
+    valor_cantos = 0
+
+    for y, x in cantos:
+        if tabuleiro[y][x] == jogador:
+            valor_cantos += 25
+        elif tabuleiro[y][x] == adversario:
+            valor_cantos -= 25
+
+    # =========================
+    # 4) Avaliação posicional (mask)
+    # =========================
+    valor_posicional = 0
+
     for y in range(8):
         for x in range(8):
-            if board[y][x] == player:
-                mask_score += EVAL_TEMPLATE[y][x]
-            elif board[y][x] == opponent:
-                mask_score -= EVAL_TEMPLATE[y][x]
+            peso = EVAL_TEMPLATE[y][x]
+            if tabuleiro[y][x] == jogador:
+                valor_posicional += peso
+            elif tabuleiro[y][x] == adversario:
+                valor_posicional -= peso
 
-    return 1.0 * piece_diff + 2.0 * mobility + 3.0 * corner_score + 0.5 * mask_score
+    # =========================
+    # Combinação final
+    # =========================
+    return (
+            1.0 * diferenca_pecas +
+            2.0 * mobilidade +
+            3.0 * valor_cantos +
+            0.5 * valor_posicional
+    )

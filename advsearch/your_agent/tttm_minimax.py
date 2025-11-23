@@ -1,4 +1,4 @@
-import random
+
 import math
 from typing import Tuple
 from ..tttm.gamestate import GameState
@@ -26,19 +26,20 @@ def make_move(state: GameState) -> Tuple[int, int]:
     # uma vez que o jogo tem profundidade maxima 9. 
     # Preencha a funcao utility com o valor de um estado terminal e passe-a como funcao de avaliação para seu minimax_move
 
-    return minimax_move(state, -1, utility)
+    profundidade_ilimitada = -1
+    return minimax_move(state, profundidade_ilimitada, utility)
 
-def utility(state, player:str) -> float:
+def utility(estado: GameState, jogador: str) -> float:
 
-    winner = state.winner()
+    vencedor = estado.winner()
 
-    if winner is None:
-
+    # Nenhum vencedor: empate
+    if vencedor is None:
         return 0.0
 
-    elif winner == player:
-
+    # Vitória do jogador analisado
+    if vencedor == jogador:
         return math.inf
-    else:
 
-        return -math.inf
+    # Vitória do oponente
+    return -math.inf

@@ -27,33 +27,49 @@ EVAL_TEMPLATE = [
 
 def make_move(state) -> Tuple[int, int]:
 
-    start = time.perf_counter()
-    TIME_LIMIT = 5.0
+    inicio = time.perf_counter()
+    LIMITE_TEMPO = 5.0
 
-    best_move = None
-    depth = 1
+    melhor_jogada = None
+    profundidade = 1
+
     while True:
-        if time.perf_counter() - start > TIME_LIMIT:
+        tempo_decorrido = time.perf_counter() - inicio
+        if tempo_decorrido >= LIMITE_TEMPO:
             break
-        move = minimax_move(state, max_depth=depth, eval_func=evaluate_mask)
-        if move is not None:
-            best_move = move
-        depth += 1
-        if depth > 10:
+
+        jogada = minimax_move(
+            state,
+            max_depth=profundidade,
+            eval_func=evaluate_mask
+        )
+
+        if jogada is not None:
+            melhor_jogada = jogada
+
+        profundidade += 1
+
+        # Evita profundidades muito custosas
+        if profundidade > 10:
             break
-    return best_move
+
+    return melhor_jogada
 
 
-def evaluate_mask(state, player:str) -> float:
+def evaluate_mask(state, jogador: str) -> float:
 
-    board = state.board.tiles
-    opponent = 'B' if player == 'W' else 'W'
+    tabuleiro = state.board.tiles
+    adversario = 'W' if jogador == 'B' else 'B'
 
-    score = 0
+    pontuacao = 0
+
     for y in range(8):
         for x in range(8):
-            if board[y][x] == player:
-                score += EVAL_TEMPLATE[y][x]
-            elif board[y][x] == opponent:
-                score -= EVAL_TEMPLATE[y][x]
-    return score
+            valor_posicao = EVAL_TEMPLATE[y][x]
+
+            if tabuleiro[y][x] == jogador:
+                pontuacao += valor_posicao
+            elif tabuleiro[y][x] == adversario:
+                pontuacao -= valor_posicao
+
+    return pontuacao

@@ -13,29 +13,40 @@ from .minimax import minimax_move
 
 
 def make_move(state) -> Tuple[int, int]:
-    start = time.perf_counter()
-    TIME_LIMIT = 5.0
 
-    best_move = None
-    depth = 1
+    inicio = time.perf_counter()
+    LIMITE_TEMPO = 5.0
+
+    melhor_jogada = None
+    profundidade = 1
+
+    # Aprofundamento iterativo até estourar o tempo ou o limite prático
     while True:
-        if time.perf_counter() - start > TIME_LIMIT:
+        tempo_decorrido = time.perf_counter() - inicio
+        if tempo_decorrido >= LIMITE_TEMPO:
             break
-        move = minimax_move(state, max_depth=depth, eval_func=evaluate_count)
-        if move is not None:
-            best_move = move
-        depth += 1
-        if depth > 10:
+
+        jogada_atual = minimax_move(state, max_depth=profundidade, eval_func=evaluate_count)
+
+        # Se o Minimax conseguiu encontrar uma jogada válida nessa profundidade:
+        if jogada_atual is not None:
+            melhor_jogada = jogada_atual
+
+        profundidade += 1
+
+        # Evita que o Minimax tente profundidades muito altas e desperdice tempo
+        if profundidade > 10:
             break
-    return best_move
+
+    return melhor_jogada
 
 
-def evaluate_count(state, player:str) -> float:
+def evaluate_count(state, jogador: str) -> float:
 
-    board = state.board.tiles
-    opponent = 'B' if player == 'W' else 'W'
+    tabuleiro = state.board.tiles
+    adversario = 'W' if jogador == 'B' else 'B'
 
-    count_player = sum(row.count(player) for row in board)
-    count_opponent = sum(row.count(opponent) for row in board)
+    qtd_jogador = sum(linha.count(jogador) for linha in tabuleiro)
+    qtd_adversario = sum(linha.count(adversario) for linha in tabuleiro)
 
-    return count_player - count_opponent
+    return qtd_jogador - qtd_adversario
