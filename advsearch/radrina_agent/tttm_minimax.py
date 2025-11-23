@@ -25,16 +25,12 @@ def make_move(state: GameState) -> Tuple[int, int]:
     return minimax_move(state, profundidade_ilimitada, utility)
 
 def utility(estado: GameState, jogador: str) -> float:
+    winner = estado.winner()
 
-    vencedor = estado.winner()
+    if winner is None:
+        return 0
 
-    # Nenhum vencedor: empate
-    if vencedor is None:
-        return 0.0
+    if winner == jogador:
+        return 1
 
-    # Vitória do jogador analisado
-    if vencedor == jogador:
-        return math.inf
-
-    # Vitória do oponente
-    return -math.inf
+    return -1

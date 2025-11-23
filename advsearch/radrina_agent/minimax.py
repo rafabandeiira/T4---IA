@@ -1,81 +1,62 @@
 import math
-import random
-from typing import Tuple, Callable
-
+from typing import Callable, Tuple
 
 
 def minimax_move(state, max_depth: int, eval_func: Callable) -> Tuple[int, int]:
 
     jogador_raiz = state.player
 
-    # -------------------------------------------------------------------------
-    # Função interna recursiva da poda alfa-beta
-    # -------------------------------------------------------------------------
-    def alfa_beta(estado, profundidade, alfa, beta, maximiza):
-        # Caso terminal ou limite atingido
-        if estado.is_terminal() or (max_depth != -1 and profundidade == max_depth):
-            return eval_func(estado, jogador_raiz)
+    def MAX(s, alfa, beta, profundidade):
 
-        acoes = estado.get_actions()
+        if s.is_terminal() or (max_depth != -1 and profundidade == max_depth):
+            return eval_func(s, jogador_raiz), None
 
-        # Situação possível no Othello: jogador sem ações
-        if not acoes:
-            return eval_func(estado, jogador_raiz)
+        v = -math.inf
+        melhor_acao = None
 
-        # ---------------------------------------------------------------------
-        # Nível Maximizador
-        # ---------------------------------------------------------------------
-        if maximiza:
-            melhor_valor = -math.inf
-            for acao in acoes:
-                estado_filho = estado.sucessor(acao)
-                valor = alfa_beta(estado_filho, profundidade + 1, alfa, beta, False)
+        for acao in s.legal_moves():
+            s_linha = s.next_state(acao)
 
-                if valor > melhor_valor:
-                    melhor_valor = valor
+            v_linha, _ = MIN(s_linha, alfa, beta, profundidade + 1)
 
-                if melhor_valor > alfa:
-                    alfa = melhor_valor
+            if v_linha > v:
+                v = v_linha
+                melhor_acao = acao
 
-                # Poda beta
-                if beta <= alfa:
-                    break
+            alfa = max(alfa, v)
 
-            return melhor_valor
+            if alfa >= beta:
+                break
 
-        # ---------------------------------------------------------------------
-        # Nível Minimizador
-        # ---------------------------------------------------------------------
-        else:
-            pior_valor = math.inf
-            for acao in acoes:
-                estado_filho = estado.sucessor(acao)
-                valor = alfa_beta(estado_filho, profundidade + 1, alfa, beta, True)
+        return v, melhor_acao
 
-                if valor < pior_valor:
-                    pior_valor = valor
+    def MIN(s, alfa, beta, profundidade):
 
-                if pior_valor < beta:
-                    beta = pior_valor
+        if s.is_terminal() or (max_depth != -1 and profundidade == max_depth):
+            return eval_func(s, jogador_raiz), None
 
-                # Poda alfa
-                if beta <= alfa:
-                    break
+        v = math.inf
+        melhor_acao = None
 
-            return pior_valor
+        for acao in s.legal_moves():
+            s_linha = s.next_state(acao)
 
-    # -------------------------------------------------------------------------
-    # Escolha da ação no nível raiz
-    # -------------------------------------------------------------------------
-    melhor_jogada = None
-    melhor_avaliacao = -math.inf
+            v_linha, _ = MAX(s_linha, alfa, beta, profundidade + 1)
 
-    for acao in state.get_actions():
-        proximo_estado = state.sucessor(acao)
-        avaliacao = alfa_beta(proximo_estado, 1, -math.inf, math.inf, False)
+            if v_linha < v:
+                v = v_linha
+                melhor_acao = acao
 
-        if avaliacao > melhor_avaliacao:
-            melhor_avaliacao = avaliacao
-            melhor_jogada = acao
+            beta = min(beta, v)
 
-    return melhor_jogada
+            if beta <= alfa:
+                break
+
+        return v, melhor_acao
+
+
+    if len(state.legal_moves()) == 9:
+        return (1, 1)
+
+    _, melhor_acao = MAX(state, -math.inf, math.inf, 0)
+    return melhor_acao
