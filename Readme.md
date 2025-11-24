@@ -119,6 +119,6 @@ A tabela abaixo resume as 6 partidas obrigatórias entre as três heurísticas:
 ---
 
 ## Resumo Final do Desempenho
-- Heurística mais vitoriosa:  
-- Total de vitórias:  
-- Critério de desempate (peças capturadas):  
+- Heurística mais vitoriosa: customizada 
+- Total de vitórias: 3  
+- Critério de desempate (peças capturadas): 154
