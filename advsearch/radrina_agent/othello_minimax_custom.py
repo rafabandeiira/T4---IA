@@ -20,7 +20,7 @@ EVAL_TEMPLATE = [
 
 def make_move(state) -> Tuple[int, int]:
 
-    melhor_jogada = minimax_move(state, max_depth=5, eval_func=evaluate_custom)
+    melhor_jogada = minimax_move(state, max_depth = 5, eval_func = evaluate_custom)
 
     return melhor_jogada
 

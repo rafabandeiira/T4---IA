@@ -6,7 +6,7 @@
 - **Rafael Silveira Bandeira – 584789 – Turma A**  
 - **Rodrigo Salvadori Feldens – 578803 – Turma A**
 
----
+--- 
 
 ## Bibliotecas Necessárias
 
@@ -73,3 +73,52 @@ Portanto, concluímos que nossa implementação joga o Tic-Tac-Toe Misere de for
 
 ---
 
+## Lista de Comandos para testar o Othello:
+
+### 1. HUMANO vs SUAS 3 HEURÍSTICAS
+- python server.py othello advsearch/humanplayer/agent.py advsearch/radrina_agent/othello_minimax_count.py
+- python server.py othello advsearch/humanplayer/agent.py advsearch/radrina_agent/othello_minimax_mask.py
+- python server.py othello advsearch/humanplayer/agent.py advsearch/radrina_agent/othello_minimax_custom.py
+
+### 2. RANDOM vs SUAS 3 HEURÍSTICAS
+- python server.py othello advsearch/randomplayer/agent.py advsearch/radrina_agent/othello_minimax_count.py
+- python server.py othello advsearch/randomplayer/agent.py advsearch/radrina_agent/othello_minimax_mask.py
+- python server.py othello advsearch/randomplayer/agent.py advsearch/radrina_agent/othello_minimax_custom.py
+
+### 3. MINI-TORNEIO — TODAS AS PARTIDAS ENTRE AS 3 HEURÍSTICAS
+
+- Contagem de peças X Valor posicional: python server.py othello advsearch/radrina_agent/othello_minimax_count.py advsearch/radrina_agent/othello_minimax_mask.py
+- Valor posicional X Contagem de peças: python server.py othello advsearch/radrina_agent/othello_minimax_mask.py advsearch/radrina_agent/othello_minimax_count.py
+- Contagem de peças X Heurística customizada: python server.py othello advsearch/radrina_agent/othello_minimax_count.py advsearch/radrina_agent/othello_minimax_custom.py
+- Heurística customizada X Contagem de peças: python server.py othello advsearch/radrina_agent/othello_minimax_custom.py advsearch/radrina_agent/othello_minimax_count.py
+- Valor posicional X Heurística customizada: python server.py othello advsearch/radrina_agent/othello_minimax_mask.py advsearch/radrina_agent/othello_minimax_custom.py
+- Heurística customizada X Valor posicional: python server.py othello advsearch/radrina_agent/othello_minimax_custom.py advsearch/radrina_agent/othello_minimax_mask.py
+
+### 4. HUMAN vs AGENTE DO TORNEIO
+python server.py othello advsearch/humanplayer/agent.py advsearch/radrina_agent/tournament_agent.py
+
+### 5. RANDOM vs AGENTE DO TORNEIO
+python server.py othello advsearch/randomplayer/agent.py advsearch/radrina_agent/tournament_agent.py
+
+---
+
+# Mini-Torneio das Heurísticas (Othello)
+
+A tabela abaixo resume as 6 partidas obrigatórias entre as três heurísticas:  
+**Contagem de peças**, **Valor posicional** e **Heurística customizada**.
+
+| Partida | Preto (começa)         | Branco                 | Vencedor               | Peças (P × B) |
+|--------|------------------------|------------------------|------------------------|---------|
+| 1 | Contagem de peças      | Valor posicional       | Contagem de peças      | 37 X 27 |
+| 2 | Valor posicional       | Contagem de peças      | Contagem de peças      | 26 X 38 |
+| 3 | Contagem de peças      | Heurística customizada | Heurística customizada | 19 X 45 |
+| 4 | Heurística customizada | Contagem de peças      | Contagem de peças      | 20 X 44 |
+| 5 | Valor posicional       | Heurística customizada | Heurística customizada | 20 X 44 |
+| 6 | Heurística customizada | Valor posicional       | Heurística customizada | 45 X 19 |
+
+---
+
+## Resumo Final do Desempenho
+- Heurística mais vitoriosa:  
+- Total de vitórias:  
+- Critério de desempate (peças capturadas):  

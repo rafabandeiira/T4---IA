@@ -3,7 +3,7 @@ from .minimax import minimax_move
 
 
 def make_move(state) -> Tuple[int, int]:
-    melhor_jogada = minimax_move(state, max_depth=7, eval_func=evaluate_count)
+    melhor_jogada = minimax_move(state, max_depth = 5, eval_func = evaluate_count)
 
     return melhor_jogada
 
