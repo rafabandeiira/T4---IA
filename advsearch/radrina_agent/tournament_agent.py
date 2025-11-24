@@ -23,7 +23,7 @@ def make_move(state: GameState) -> Tuple[int, int]:
     para respeitar o limite de tempo de 5 segundos.
     """
     start_time = time.time()
-    time_limit = 4.9  # Margem de segurança (limite é 5.0s)
+    time_limit = 4.8  # Margem de segurança (limite é 5.0s)
 
     best_move = None
 

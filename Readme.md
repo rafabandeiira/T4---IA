@@ -102,7 +102,7 @@ python server.py othello advsearch/randomplayer/agent.py advsearch/radrina_agent
 
 ---
 
-# Mini-Torneio das Heurísticas (Othello)
+## Mini-Torneio das Heurísticas (Othello)
 
 A tabela abaixo resume as 6 partidas obrigatórias entre as três heurísticas:  
 **Contagem de peças**, **Valor posicional** e **Heurística customizada**.
@@ -122,3 +122,48 @@ A tabela abaixo resume as 6 partidas obrigatórias entre as três heurísticas:
 - Heurística mais vitoriosa: customizada 
 - Total de vitórias: 3  
 - Critério de desempate (peças capturadas): 154
+
+---
+
+# Detalhes da Implementação do Agente de Torneio
+
+A arquitetura do agente foi projetada para resolver o compromisso entre a profundidade de busca (essencial para boas jogadas) e o limite rígido de tempo (5 segundos). A implementação integra algoritmos de busca clássicos com heurísticas de gerenciamento de recursos.
+
+
+## 1. Algoritmo de Busca: Minimax com Poda Alfa-Beta
+
+A base da tomada de decisão é o algoritmo **Minimax**, implementado com a otimização de **Poda Alfa-Beta** (`minimax_move`).
+
+**Justificativa:**  
+O Minimax permite antecipar as respostas ótimas do adversário, enquanto a poda Alfa-Beta reduz drasticamente o número de nós visitados na árvore de jogo, cortando ramos que não influenciam a decisão final (quando `alfa >= beta` na maximização ou `beta <= alfa` na minimização). Isso permite alcançar profundidades maiores do que uma busca exaustiva simples.
+
+
+## 2. Estratégia de Controle de Tempo: Aprofundamento Iterativo (Iterative Deepening)
+
+Para garantir que o agente nunca exceda o tempo limite (o que causaria desclassificação imediata), não foi utilizada uma profundidade fixa. Em vez disso, implementou-se o **Aprofundamento Iterativo** no arquivo `tournament_agent.py`.
+
+**Funcionamento:**  
+O algoritmo realiza buscas sucessivas com profundidades crescentes (`d = 1, 2, 3, ...`).  
+O resultado de cada iteração é salvo como a **melhor jogada provisória**.
+
+**Predição de Custo:**  
+Antes de iniciar uma nova profundidade, o agente estima o tempo necessário baseando-se no tempo gasto na iteração anterior multiplicado por um fator de ramificação (branching factor) estimado.  
+Se a estimativa exceder o tempo restante (com margem de segurança de **0.2s**), o laço é interrompido e a melhor jogada da iteração anterior é retornada.
+
+
+## 3. Função de Avaliação Híbrida
+
+A função `evaluate_tournament` consolida lógicas presentes nos testes anteriores para criar uma avaliação robusta:
+
+- Integra a análise posicional estática via **matriz de pesos**.  
+- Calcula a **mobilidade relativa** (diferença de movimentos legais) e o **controle de cantos**.  
+- Utiliza a **contagem de peças** (diferença absoluta) apenas nas fases finais do jogo, onde essa métrica define a vitória.
+
+
+## 4. Robustez e Otimizações
+
+### Tratamento de Jogada Única
+Foi adicionada uma verificação inicial que detecta se há apenas uma jogada legal disponível.  
+Nesse caso, a busca é ignorada e a jogada é retornada imediatamente, economizando tempo de CPU.
+
+---
