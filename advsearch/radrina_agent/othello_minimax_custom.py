@@ -20,30 +20,7 @@ EVAL_TEMPLATE = [
 
 def make_move(state) -> Tuple[int, int]:
 
-    inicio = time.perf_counter()
-    LIMITE_TEMPO = 5.0
-
-    melhor_jogada = None
-    profundidade = 1
-
-    while True:
-        if time.perf_counter() - inicio >= LIMITE_TEMPO:
-            break
-
-        jogada = minimax_move(
-            state,
-            max_depth=profundidade,
-            eval_func=evaluate_custom
-        )
-
-        if jogada is not None:
-            melhor_jogada = jogada
-
-        profundidade += 1
-
-        # Segurança para não tentar profundidades enormes
-        if profundidade > 10:
-            break
+    melhor_jogada = minimax_move(state, max_depth=5, eval_func=evaluate_custom)
 
     return melhor_jogada
 
@@ -51,34 +28,24 @@ def make_move(state) -> Tuple[int, int]:
 def evaluate_custom(state, jogador: str) -> float:
 
     tabuleiro = state.board.tiles
-    adversario = 'W' if jogador == 'B' else 'B'
+    adversario = "W" if jogador == "B" else "B"
 
-    # =========================
-    # 1) Diferença de peças
-    # =========================
     qtd_jogador = sum(linha.count(jogador) for linha in tabuleiro)
     qtd_adversario = sum(linha.count(adversario) for linha in tabuleiro)
     diferenca_pecas = qtd_jogador - qtd_adversario
 
-    # =========================
-    # 2) Mobilidade
-    # =========================
     jogador_original = state.player
 
     state.player = jogador
-    movimentos_jogador = len(state.get_actions())
+    movimentos_jogador = len(state.legal_moves())
 
     state.player = adversario
-    movimentos_adversario = len(state.get_actions())
+    movimentos_adversario = len(state.legal_moves())
 
-    # restaurar o jogador original
     state.player = jogador_original
 
     mobilidade = movimentos_jogador - movimentos_adversario
 
-    # =========================
-    # 3) Controle dos cantos
-    # =========================
     cantos = [(0, 0), (0, 7), (7, 0), (7, 7)]
     valor_cantos = 0
 
@@ -88,9 +55,6 @@ def evaluate_custom(state, jogador: str) -> float:
         elif tabuleiro[y][x] == adversario:
             valor_cantos -= 25
 
-    # =========================
-    # 4) Avaliação posicional (mask)
-    # =========================
     valor_posicional = 0
 
     for y in range(8):
@@ -101,12 +65,9 @@ def evaluate_custom(state, jogador: str) -> float:
             elif tabuleiro[y][x] == adversario:
                 valor_posicional -= peso
 
-    # =========================
-    # Combinação final
-    # =========================
     return (
-            1.0 * diferenca_pecas +
-            2.0 * mobilidade +
-            3.0 * valor_cantos +
-            0.5 * valor_posicional
+        1.0 * diferenca_pecas
+        + 2.0 * mobilidade
+        + 3.0 * valor_cantos
+        + 0.5 * valor_posicional
     )

@@ -54,9 +54,5 @@ def minimax_move(state, max_depth: int, eval_func: Callable) -> Tuple[int, int]:
 
         return v, melhor_acao
 
-
-    if len(state.legal_moves()) == 9:
-        return (1, 1)
-
     _, melhor_acao = MAX(state, -math.inf, math.inf, 0)
     return melhor_acao
