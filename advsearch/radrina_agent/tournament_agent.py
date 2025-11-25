@@ -4,7 +4,6 @@ from typing import Tuple
 from ..othello.gamestate import GameState
 from .minimax import minimax_move
 
-# Template de avaliação posicional (Matrix de Pesos)
 EVAL_TEMPLATE = [
     [100, -30, 6, 2, 2, 6, -30, 100],
     [-30, -50, 1, 1, 1, 1, -50, -30],
@@ -18,12 +17,9 @@ EVAL_TEMPLATE = [
 
 
 def make_move(state: GameState) -> Tuple[int, int]:
-    """
-    Determina a melhor jogada usando Minimax com Iterative Deepening
-    para respeitar o limite de tempo de 5 segundos.
-    """
+
     start_time = time.time()
-    time_limit = 4.8  # Margem de segurança (limite é 5.0s)
+    time_limit = 4.8  # Margem de segurança (limite 5.0s)
 
     best_move = None
 
@@ -34,7 +30,6 @@ def make_move(state: GameState) -> Tuple[int, int]:
     if not legal_moves:
         return (-1, -1)
 
-    # CORREÇÃO AQUI: Converter para lista antes de acessar o índice 0
     if len(legal_moves) == 1:
         return list(legal_moves)[0]
 
@@ -57,8 +52,6 @@ def make_move(state: GameState) -> Tuple[int, int]:
         loop_duration = time.time() - loop_start
 
         # Heurística de Tempo:
-        # Se (tempo_atual + 6*tempo_do_ultimo_loop) > limite, paramos.
-        # O fator 6 é conservador (branching factor médio)
         if elapsed + (loop_duration * 6) > time_limit:
             break
 
@@ -72,11 +65,7 @@ def make_move(state: GameState) -> Tuple[int, int]:
 
 
 def evaluate_tournament(state: GameState, jogador: str) -> float:
-    """
-    Heurística customizada avançada.
-    Combina: Diferença de peças, Mobilidade, Cantos e Valor Posicional.
-    Os pesos variam dinamicamente conforme a fase do jogo.
-    """
+
     tabuleiro = state.board.tiles
     adversario = "W" if jogador == "B" else "B"
 
@@ -115,14 +104,12 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
         w_corner = 10.0
         w_pos = 1.5
     else:  # Endgame
-        w_diff = 5.0  # Agora queremos ganhar peças
+        w_diff = 5.0
         w_mob = 1.0
         w_corner = 15.0
         w_pos = 1.0
 
     # 2. Mobilidade (Número de jogadas legais)
-    # Precisamos simular a troca de turnos para calcular a mobilidade
-    # Isso é custoso computacionalmente, mas vale a pena.
     original_player = state.player
 
     state.player = jogador
