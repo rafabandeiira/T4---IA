@@ -19,45 +19,39 @@ EVAL_TEMPLATE = [
 def make_move(state: GameState) -> Tuple[int, int]:
 
     start_time = time.time()
-    time_limit = 4.8  # Margem de segurança (limite 5.0s)
+    time_limit = 4.8
 
     best_move = None
 
-    # Obtém jogadas legais
     legal_moves = state.legal_moves()
 
-    # Se não houver jogadas, retorna pass (-1, -1)
     if not legal_moves:
         return (-1, -1)
 
     if len(legal_moves) == 1:
         return list(legal_moves)[0]
 
-    # Iterative Deepening
-    # Começa com profundidade 1 e aumenta até onde o tempo permitir
     depth = 1
-    max_depth_possible = 64  # Impossível passar disso no Othello
+    max_depth_possible = 64
 
     while depth <= max_depth_possible:
         loop_start = time.time()
 
-        # Chama o minimax com a profundidade atual
-        current_move = minimax_move(state, max_depth=depth, eval_func=evaluate_tournament)
+        current_move = minimax_move(
+            state, max_depth=depth, eval_func=evaluate_tournament
+        )
 
-        # Se o minimax retornou algo válido, atualizamos nossa melhor jogada
         if current_move:
             best_move = current_move
 
         elapsed = time.time() - start_time
         loop_duration = time.time() - loop_start
 
-        # Heurística de Tempo:
         if elapsed + (loop_duration * 6) > time_limit:
             break
 
         depth += 1
 
-        # Check extra de segurança absoluta
         if elapsed > time_limit:
             break
 
@@ -69,12 +63,10 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
     tabuleiro = state.board.tiles
     adversario = "W" if jogador == "B" else "B"
 
-    # 1. Contagem de peças e fase do jogo
     total_pecas = 0
     qtd_jogador = 0
     qtd_adversario = 0
 
-    # Loop otimizado para leitura única do tabuleiro
     for y in range(8):
         row = tabuleiro[y]
         qtd_jogador += row.count(jogador)
@@ -83,21 +75,17 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
     total_pecas = qtd_jogador + qtd_adversario
     diferenca_pecas = qtd_jogador - qtd_adversario
 
-    # Definição de Pesos Dinâmicos baseados na fase do jogo
-    # Fase 1: Abertura (< 20 peças) -> Prioriza mobilidade e posicionamento, ignora contagem
-    # Fase 2: Meio (20-50 peças) -> Balanceado
-    # Fase 3: Final (> 50 peças) -> Contagem de peças torna-se crucial
-
+    # Contagem de pecas apenas na fase final
     w_diff = 0.0
     w_mob = 0.0
     w_corner = 0.0
     w_pos = 0.0
 
     if total_pecas < 20:
-        w_diff = 0.5  # Contagem pouco importa agora
-        w_mob = 4.0  # Mobilidade é rei no início
-        w_corner = 5.0  # Cantos sempre bons
-        w_pos = 1.0  # Tabuleiro posicional importante
+        w_diff = 0.5
+        w_mob = 4.0
+        w_corner = 5.0
+        w_pos = 1.0
     elif total_pecas <= 50:
         w_diff = 1.0
         w_mob = 2.0
@@ -109,7 +97,7 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
         w_corner = 15.0
         w_pos = 1.0
 
-    # 2. Mobilidade (Número de jogadas legais)
+    # Mobilidade
     original_player = state.player
 
     state.player = jogador
@@ -118,17 +106,16 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
     state.player = adversario
     mob_adversario = len(state.legal_moves())
 
-    state.player = original_player  # Restaura estado original
+    state.player = original_player
 
     mobilidade = mob_jogador - mob_adversario
 
-    # 3. Cantos e Posicionamento
+    # Cantos
     valor_cantos = 0
     valor_posicional = 0
 
     cantos_coords = [(0, 0), (0, 7), (7, 0), (7, 7)]
 
-    # Cálculo rápido de cantos
     for cy, cx in cantos_coords:
         peca = tabuleiro[cy][cx]
         if peca == jogador:
@@ -136,7 +123,7 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
         elif peca == adversario:
             valor_cantos -= 1
 
-    # Cálculo posicional (Weighted Matrix)
+    # Cálculo posicional (matriz de pesos)
     for y in range(8):
         for x in range(8):
             peso = EVAL_TEMPLATE[y][x]
@@ -146,10 +133,11 @@ def evaluate_tournament(state: GameState, jogador: str) -> float:
             elif peca == adversario:
                 valor_posicional -= peso
 
-    # Somatório final ponderado
-    score = (w_diff * diferenca_pecas) + \
-            (w_mob * mobilidade) + \
-            (w_corner * valor_cantos * 25) + \
-            (w_pos * valor_posicional)
+    score = (
+        (w_diff * diferenca_pecas)
+        + (w_mob * mobilidade)
+        + (w_corner * valor_cantos * 25)
+        + (w_pos * valor_posicional)
+    )
 
     return score
