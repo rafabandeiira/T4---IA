@@ -167,3 +167,64 @@ Foi adicionada uma verificação inicial que detecta se há apenas uma jogada le
 Nesse caso, a busca é ignorada e a jogada é retornada imediatamente, economizando tempo de CPU.
 
 ---
+# Heurística Customizada do Othello
+
+A heurística implementada para avaliação dos estados do jogo Othello combina quatro fatores clássicos utilizados em Inteligência Artificial para jogos de tabuleiro: **diferença de peças**, **mobilidade**, **controle dos cantos** e **valor posicional**. O objetivo é produzir um valor numérico que indique quão favorável é o estado para o jogador sendo avaliado.
+
+---
+
+## Componentes da Heurística
+
+### 1. Diferença de Peças (Piece Difference)
+
+Conta quantas peças pertencem ao jogador e quantas pertencem ao adversário:
+
+- Fórmula:  
+  `diferença = peças_do_jogador – peças_do_adversário`
+
+Esse fator representa vantagem material, mas recebe peso reduzido, já que possuir muitas peças cedo pode ser desvantajoso.
+
+**Peso:** `1.0`
+
+---
+
+### 2. Mobilidade
+
+Calcula quantos movimentos legais cada jogador possui:
+
+- Fórmula:  
+  `mobilidade = movimentos_do_jogador – movimentos_do_adversário`
+
+Mobilidade reflete controle estratégico do tabuleiro e capacidade de evitar posições desfavoráveis.
+
+**Peso:** `2.0`
+
+---
+
+### 3. Controle dos Cantos
+
+Cantos são posições extremamente seguras: uma vez ocupados, nunca podem ser revertidos pelo adversário.
+
+- Cada canto ocupado pelo jogador adiciona pontos.
+- Cada canto ocupado pelo adversário subtrai pontos.
+
+**Valor por canto:** `±25`  
+**Peso final:** `3.0`
+
+---
+
+### 4. Valor Posicional (Positional Weights)
+
+A heurística utiliza uma matriz 8×8 (EVAL_TEMPLATE) com pesos estratégicos para cada casa do tabuleiro:
+
+- Cantos têm valores altos.  
+- Casas vulneráveis próximas aos cantos têm valores negativos.  
+- Bordas possuem valores positivos.  
+- Centro possui valores moderados.
+
+Essa tabela segue padrões clássicos encontrados em heurísticas amplamente utilizadas na literatura.
+
+**Peso:** `0.5`
+
+---
+
