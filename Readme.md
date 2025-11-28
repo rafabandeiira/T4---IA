@@ -127,7 +127,7 @@ A tabela abaixo resume as 6 partidas obrigatórias entre as três heurísticas:
 
 # Detalhes da Implementação do Agente de Torneio
 
-A arquitetura do agente foi projetada para resolver o compromisso entre a profundidade de busca (essencial para boas jogadas) e o limite rígido de tempo (5 segundos). A implementação integra algoritmos de busca clássicos com heurísticas de gerenciamento de recursos.
+A arquitetura do agente foi projetada para resolver o compromisso entre a profundidade de busca e o limite de tempo. A implementação integra algoritmos de busca clássicos com heurísticas de gerenciamento de recursos.
 
 
 ## 1. Algoritmo de Busca: Minimax com Poda Alfa-Beta
@@ -155,9 +155,9 @@ Se a estimativa exceder o tempo restante (com margem de segurança de **0.2s**),
 
 A função `evaluate_tournament` consolida lógicas presentes nos testes anteriores para criar uma avaliação robusta:
 
-- Integra a análise posicional estática via **matriz de pesos**.  
-- Calcula a **mobilidade relativa** (diferença de movimentos legais) e o **controle de cantos**.  
-- Utiliza a **contagem de peças** (diferença absoluta) apenas nas fases finais do jogo, onde essa métrica define a vitória.
+- Integra a análise posicional estática via **matriz de pesos**. Essa ideia veio da heuristica já previamente implementada no trabalho.  
+- Calcula a **mobilidade relativa** (diferença de movimentos legais) e o **controle de cantos**. Essa parte do nosso código foi sugerida pelo modelo de IA Gemini, e implementada a partir da adaptação de uma função produzida pelo modelo. 
+- Utiliza a **contagem de peças** (diferença absoluta) apenas nas fases finais do jogo, onde essa métrica define a vitória. Isso também é uma adaptação de uma heurística aplicada anteriorment.
 
 
 ## 4. Robustez e Otimizações
